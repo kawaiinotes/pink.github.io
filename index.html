@@ -14,38 +14,32 @@
 </head>
 <body>
   <div id="trigger">▶︎</div>
-  <div id="log">loading…</div>
 
   <audio id="audio" src="audio.mp3" loop playsinline preload="auto"></audio>
 
-  <script>
-    const t = document.getElementById("trigger");
-    const a = document.getElementById("audio");
-    const log = (m) => (document.getElementById("log").textContent = m);
+<script>
+  const t = document.getElementById("trigger");
+  const a = document.getElementById("audio");
+  const log = (m) => (document.getElementById("log").textContent = m);
 
-    // よくあるイベントを全部表示
-    ["loadstart","loadedmetadata","canplay","canplaythrough","error","stalled","waiting","play","playing","pause"].forEach(ev => {
-      a.addEventListener(ev, () => {
-        const err = a.error ? ` | error=${a.error.code}` : "";
-        log(`${ev} | src=${a.currentSrc || a.src} | readyState=${a.readyState}${err}`);
-      });
-    });
-
-    t.addEventListener("click", async () => {
-      try {
-        log("click ▶︎ : trying play()");
+  t.addEventListener("click", async () => {
+    try {
+      if (a.paused) {
         await a.play();
-        log("play() success ✅");
-      } catch (e) {
-        log("play() blocked ❌ : " + (e?.name || e));
-        console.warn(e);
+        log("playing ▶︎");
+      } else {
+        a.pause();
+        log("paused ■");
       }
-    });
+    } catch (e) {
+      log("error: " + (e?.name || e));
+      console.warn(e);
+    }
+  });
 
-    // 音量ミュート系の事故を潰す
-    a.muted = false;
-    a.volume = 1.0;
-  </script>
+  a.muted = false;
+  a.volume = 1.0;
+</script>
 </body>
 </html>
 
