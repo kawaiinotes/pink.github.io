@@ -3,68 +3,50 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>pink space</title>
+  <title>pink space debug</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
-    body {
-      background: #ff00ff; /* 真っピンク */
-      overflow: hidden;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    /* 左上の小さな ▶︎ */
-    #trigger {
-      position: fixed;
-      top: 14px;
-      left: 14px;
-      font-size: 14px;      /* 小さめ */
-      font-family: system-ui, -apple-system, "Hiragino Sans", sans-serif;
-      color: rgba(0,0,0,0.85);
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 120ms ease;
-    }
-    #trigger:hover {
-      opacity: 1;
-    }
-
-    /* 再生中はちょっと存在感を消す */
-    .playing {
-      opacity: 0.35;
-    }
-
-    /* ほんの呼吸 */
-    .halo {
-      position: absolute;
-      inset: -40vmin;
-      background: radial-gradient(circle at center,
-        rgba(255,255,255,0.18),
-        rgba(255,255,255,0) 55%);
-      animation: breathe 5s ease-in-out infinite;
-      pointer-events: none;
-      mix-blend-mode: screen;
-    }
-    @keyframes breathe {
-      0%,100% { transform: scale(0.95); opacity: 0.5; }
-      50%     { transform: scale(1.05); opacity: 0.85; }
-    }
+    html, body { height: 100%; margin: 0; }
+    body { background:#ff00ff; overflow:hidden; user-select:none; }
+    #trigger { position:fixed; top:14px; left:14px; font-size:14px; cursor:pointer; color:rgba(0,0,0,.85); opacity:.8; }
+    #log { position:fixed; bottom:10px; left:10px; right:10px; font:12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+           background:rgba(255,255,255,.25); border:1px solid rgba(0,0,0,.6); padding:8px 10px; border-radius:10px; }
   </style>
 </head>
-
 <body>
-  <div class="halo" aria-hidden="true"></div>
+  <div id="trigger">▶︎</div>
+  <div id="log">loading…</div>
 
-  <!-- 見えるのはこれだけ -->
-  <div id="trigger" aria-label="toggle audio">▶︎</div>
-
-  <!-- 音ファイル：同じフォルダに audio.mp3 -->
   <audio id="audio" src="audio.mp3" loop playsinline preload="auto"></audio>
 
   <script>
     const t = document.getElementById("trigger");
-    con
+    const a = document.getElementById("audio");
+    const log = (m) => (document.getElementById("log").textContent = m);
+
+    // よくあるイベントを全部表示
+    ["loadstart","loadedmetadata","canplay","canplaythrough","error","stalled","waiting","play","playing","pause"].forEach(ev => {
+      a.addEventListener(ev, () => {
+        const err = a.error ? ` | error=${a.error.code}` : "";
+        log(`${ev} | src=${a.currentSrc || a.src} | readyState=${a.readyState}${err}`);
+      });
+    });
+
+    t.addEventListener("click", async () => {
+      try {
+        log("click ▶︎ : trying play()");
+        await a.play();
+        log("play() success ✅");
+      } catch (e) {
+        log("play() blocked ❌ : " + (e?.name || e));
+        console.warn(e);
+      }
+    });
+
+    // 音量ミュート系の事故を潰す
+    a.muted = false;
+    a.volume = 1.0;
+  </script>
+</body>
+</html>
+
 
