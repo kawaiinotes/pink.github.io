@@ -1,4 +1,5 @@
 # 空間PINK 🖥️🎫
 
-©︎ 2025 qulabel all right reserved  
-[[[https://pink.github.io](https://ma-pink.github.io/pink/)]
+©︎ 2025 qulabel all right reserved
+https://ma-pink.github.io/pink/
+
